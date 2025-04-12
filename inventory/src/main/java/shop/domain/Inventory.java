@@ -21,15 +21,13 @@ public class Inventory {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String quantity;
+    private Integer quantity;
 
     @PostPersist
     public void onPostPersist() {
         InventoryIncressed inventoryIncressed = new InventoryIncressed(this);
         inventoryIncressed.publishAfterCommit();
 
-        InventoryDecressed inventoryDecressed = new InventoryDecressed(this);
-        inventoryDecressed.publishAfterCommit();
     }
 
     public static InventoryRepository repository() {
@@ -49,18 +47,14 @@ public class Inventory {
 
         */
 
-        /** Example 2:  finding and process
-        
-
-        repository().findById(orderPlaced.get???()).ifPresent(inventory->{
+        repository().findById(Long.valueOf(orderPlaced.getProductId())).ifPresent(inventory->{
             
-            inventory // do something
+            inventory.setQuantity(inventory.getQuantity() - orderPlaced.getQuantity());
             repository().save(inventory);
-
-
+            
+            InventoryDecressed inventoryDecressed = new InventoryDecressed(inventory);
+            inventoryDecressed.publishAfterCommit();
          });
-        */
-
     }
 
     //>>> Clean Arch / Port Method
